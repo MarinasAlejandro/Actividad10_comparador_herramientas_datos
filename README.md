@@ -67,4 +67,4 @@ Comparar **Tableau** (herramienta vista en clase) con **Power BI** (competidora)
 ## Equipo
 
 - Alejandro Marinas
-- [@Cbas420](https://github.com/Cbas420)
+- Sebastián Pavía ([@Cbas420](https://github.com/Cbas420))
