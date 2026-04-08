@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Tableau
+*.twb.backup
+
+# Power BI temp
+*.tmp
+
+# Large datasets (add specific files if needed)
+# dataset/*.csv
+
+# IDE
+.vscode/
+.idea/
