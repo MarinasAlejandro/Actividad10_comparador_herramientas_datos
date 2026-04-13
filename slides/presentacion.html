@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau vs Power BI — Comparacion de Herramientas de Datos</title>
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap">
+    <script src="https://cdn.lordicon.com/lordicon.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a1628;
+            --bg-secondary: #111d33;
+            --bg-card: #162040;
+            --text-primary: #f0f4f8;
+            --text-secondary: #8899b0;
+            --accent: #3b82f6;
+            --accent-light: #60a5fa;
+            --accent-glow: rgba(59, 130, 246, 0.2);
+            --tableau-color: #e97627;
+            --tableau-glow: rgba(233, 118, 39, 0.2);
+            --powerbi-color: #f2c811;
+            --powerbi-glow: rgba(242, 200, 17, 0.2);
+            --green: #10b981;
+
+            --font-display: 'Clash Display', sans-serif;
+            --font-body: 'Satoshi', sans-serif;
+            --title-size: clamp(2rem, 6vw, 4.5rem);
+            --h2-size: clamp(1.5rem, 4vw, 2.8rem);
+            --h3-size: clamp(1.1rem, 2.5vw, 1.6rem);
+            --body-size: clamp(0.75rem, 1.4vw, 1.1rem);
+            --small-size: clamp(0.65rem, 1vw, 0.85rem);
+
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(0.75rem, 2vw, 2rem);
+            --element-gap: clamp(0.3rem, 1vw, 0.75rem);
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            height: 100%;
+        }
+
+        /* ===========================================
+           SLIDE
+           =========================================== */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            padding: var(--slide-padding);
+            padding-bottom: calc(var(--slide-padding) + 40px);
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--tableau-color), var(--accent), var(--powerbi-color));
+            z-index: 200;
+            transition: width 0.3s ease;
+        }
+
+        /* ===========================================
+           SECTION NAV (bottom bar)
+           =========================================== */
+        .section-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 36px;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(0.3rem, 1vw, 0.8rem);
+            z-index: 200;
+            padding: 0 1rem;
+        }
+
+        .section-item {
+            font-family: var(--font-body);
+            font-size: clamp(0.55rem, 0.8vw, 0.7rem);
+            color: var(--text-secondary);
+            opacity: 0.4;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border: none;
+            background: none;
+        }
+
+        .section-item.active {
+            opacity: 1;
+            color: var(--accent-light);
+            background: var(--accent-glow);
+        }
+
+        .section-item:hover {
+            opacity: 0.8;
+        }
+
+        .section-sep {
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            flex-shrink: 0;
+        }
+
+        /* ===========================================
+           NAV DOTS
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: clamp(0.5rem, 1.5vw, 1.5rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 200;
+        }
+
+        .nav-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .nav-dot.active {
+            background: var(--accent);
+            transform: scale(1.4);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-family: var(--font-display);
+            font-size: var(--title-size);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 600;
+            line-height: 1.2;
+            margin-bottom: var(--content-gap);
+        }
+
+        h3 {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        p, li {
+            font-size: var(--body-size);
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        .accent { color: var(--accent-light); }
+        .tableau-accent { color: var(--tableau-color); }
+        .powerbi-accent { color: var(--powerbi-color); }
+
+        .subtitle {
+            font-size: clamp(0.9rem, 1.8vw, 1.3rem);
+            color: var(--text-secondary);
+            margin-top: var(--element-gap);
+        }
+
+        .divider {
+            width: 60px;
+            height: 3px;
+            background: var(--accent);
+            margin: var(--content-gap) 0;
+            border-radius: 2px;
+        }
+
+        /* ===========================================
+           LAYOUTS
+           =========================================== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--content-gap);
+            flex: 1;
+            max-height: 80vh;
+        }
+
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--content-gap);
+        }
+
+        /* ===========================================
+           CARDS
+           =========================================== */
+        .card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: clamp(1rem, 2vw, 1.5rem);
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+
+        .card h3 { margin-bottom: var(--element-gap); }
+
+        .card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--element-gap);
+        }
+
+        .card li::before {
+            content: "→ ";
+            color: var(--accent);
+        }
+
+        .card-tableau { border-left: 3px solid var(--tableau-color); }
+        .card-powerbi { border-left: 3px solid var(--powerbi-color); }
+
+        /* ===========================================
+           LOGOS
+           =========================================== */
+        .logo-img {
+            height: clamp(28px, 4vw, 45px);
+            object-fit: contain;
+            filter: brightness(1.1);
+        }
+
+        .logo-header {
+            display: flex;
+            align-items: center;
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+            margin-bottom: var(--content-gap);
+        }
+
+        /* ===========================================
+           COMPARE TABLE
+           =========================================== */
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--body-size);
+        }
+
+        .compare-table th {
+            font-family: var(--font-display);
+            font-weight: 600;
+            padding: clamp(0.4rem, 1vh, 0.8rem) clamp(0.5rem, 1vw, 1rem);
+            text-align: left;
+            border-bottom: 2px solid var(--accent);
+            font-size: var(--body-size);
+        }
+
+        .compare-table td {
+            padding: clamp(0.3rem, 0.8vh, 0.6rem) clamp(0.5rem, 1vw, 1rem);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            color: var(--text-secondary);
+            font-size: var(--small-size);
+        }
+
+        .compare-table tr:last-child td { border-bottom: none; }
+        .col-tableau { color: var(--tableau-color); }
+        .col-powerbi { color: var(--powerbi-color); }
+
+        /* ===========================================
+           STAT BOXES
+           =========================================== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+            gap: var(--content-gap);
+        }
+
+        .stat-box {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: clamp(1rem, 2vw, 1.5rem);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-box:hover { transform: scale(1.03); }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 4vw, 3rem);
+            font-weight: 700;
+            color: var(--accent-light);
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* ===========================================
+           TAGS
+           =========================================== */
+        .tag {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: var(--small-size);
+            font-weight: 500;
+        }
+
+        .tag-tableau { background: var(--tableau-glow); color: var(--tableau-color); }
+        .tag-powerbi { background: var(--powerbi-glow); color: var(--powerbi-color); }
+
+        /* ===========================================
+           TIMELINE (for tutorials)
+           =========================================== */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.5rem, 1.2vh, 1rem);
+            position: relative;
+            padding-left: clamp(2rem, 4vw, 3rem);
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent), transparent);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: clamp(0.5rem, 1vw, 0.8rem);
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: calc(-1 * clamp(2rem, 4vw, 3rem) + 5px);
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+            flex-shrink: 0;
+        }
+
+        .timeline-dot.tableau { background: var(--tableau-color); box-shadow: 0 0 10px var(--tableau-glow); }
+        .timeline-dot.powerbi { background: var(--powerbi-color); box-shadow: 0 0 10px var(--powerbi-glow); }
+
+        .timeline-content h3 {
+            font-size: var(--h3-size);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .timeline-content p {
+            font-size: var(--body-size);
+            margin-top: 2px;
+        }
+
+        /* ===========================================
+           CTA BUTTON
+           =========================================== */
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: clamp(0.6rem, 1.5vw, 0.9rem) clamp(1.2rem, 3vw, 2rem);
+            border-radius: 12px;
+            font-family: var(--font-display);
+            font-size: var(--body-size);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-tableau {
+            background: linear-gradient(135deg, var(--tableau-color), #c45e15);
+            color: white;
+            box-shadow: 0 4px 20px var(--tableau-glow);
+        }
+
+        .cta-tableau:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(233, 118, 39, 0.4);
+        }
+
+        .cta-powerbi {
+            background: linear-gradient(135deg, var(--powerbi-color), #d4a800);
+            color: #1a1a1a;
+            box-shadow: 0 4px 20px var(--powerbi-glow);
+        }
+
+        .cta-powerbi:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(242, 200, 17, 0.4);
+        }
+
+        .cta-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .cta-btn:hover .cta-arrow {
+            transform: translateX(4px);
+        }
+
+        /* ===========================================
+           COMPANY TAGS
+           =========================================== */
+        .company-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(0.3rem, 0.8vw, 0.5rem);
+        }
+
+        .company-tag {
+            background: var(--bg-card);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        /* ===========================================
+           CONCLUSION CARDS
+           =========================================== */
+        .conclusion-number {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: var(--accent);
+            opacity: 0.3;
+            line-height: 1;
+        }
+
+        /* ===========================================
+           PLACEHOLDER
+           =========================================== */
+        .placeholder {
+            background: var(--bg-card);
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: var(--body-size);
+            min-height: clamp(100px, 20vh, 250px);
+        }
+
+        /* ===========================================
+           GLOW BACKGROUNDS
+           =========================================== */
+        .glow-tableau::after {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 40%;
+            height: 60%;
+            background: radial-gradient(ellipse, var(--tableau-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .glow-powerbi::after {
+            content: '';
+            position: absolute;
+            top: -20%;
+            right: -10%;
+            width: 40%;
+            height: 60%;
+            background: radial-gradient(ellipse, var(--powerbi-glow) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(25px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(30px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal,
+        .slide.visible .reveal-left,
+        .slide.visible .reveal-right,
+        .slide.visible .reveal-scale {
+            opacity: 1;
+            transform: translateY(0) translateX(0) scale(1);
+        }
+
+        .reveal:nth-child(1), .reveal-left:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2), .reveal-right:nth-child(2) { transition-delay: 0.15s; }
+        .reveal:nth-child(3), .reveal-left:nth-child(3) { transition-delay: 0.25s; }
+        .reveal:nth-child(4), .reveal-right:nth-child(4) { transition-delay: 0.35s; }
+        .reveal:nth-child(5) { transition-delay: 0.45s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px var(--accent-glow); }
+            50% { box-shadow: 0 0 30px var(--accent-glow), 0 0 50px rgba(59,130,246,0.1); }
+        }
+
+        .float { animation: float 3s ease-in-out infinite; }
+
+        /* ===========================================
+           RESPONSIVE
+           =========================================== */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.5rem, 5vw, 3rem);
+                --h2-size: clamp(1.2rem, 3vw, 2rem);
+            }
+        }
+
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+            }
+            .nav-dots, .section-nav { display: none; }
+            .slide { padding-bottom: var(--slide-padding); }
+        }
+
+        @media (max-width: 768px) {
+            .two-col { grid-template-columns: 1fr; }
+            .three-col { grid-template-columns: 1fr; }
+            .section-nav { display: none; }
+            .slide { padding-bottom: var(--slide-padding); }
+        }
+
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 2vw, 1rem);
+                --title-size: clamp(1.2rem, 4vw, 2rem);
+                --body-size: clamp(0.65rem, 1vw, 0.85rem);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-left, .reveal-right, .reveal-scale {
+                transition: opacity 0.3s ease;
+                transform: none;
+            }
+            html { scroll-behavior: auto; }
+            .float { animation: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+<nav class="nav-dots" id="navDots"></nav>
+
+<!-- Section navigation bar -->
+<nav class="section-nav" id="sectionNav">
+    <button class="section-item active" data-section="0">Intro</button>
+    <div class="section-sep"></div>
+    <button class="section-item" data-section="3">Herramientas</button>
+    <div class="section-sep"></div>
+    <button class="section-item" data-section="5">Comparacion</button>
+    <div class="section-sep"></div>
+    <button class="section-item" data-section="7">Empresas</button>
+    <div class="section-sep"></div>
+    <button class="section-item" data-section="9">Tutorial</button>
+    <div class="section-sep"></div>
+    <button class="section-item" data-section="11">Dashboards</button>
+    <div class="section-sep"></div>
+    <button class="section-item" data-section="13">Conclusion</button>
+</nav>
+
+<!-- =============================================
+     SLIDE 1: PORTADA
+     ============================================= -->
+<section class="slide" data-section="Intro">
+    <div class="slide-content" style="align-items: center; text-align: center;">
+        <p class="reveal" style="font-size: var(--body-size); color: var(--accent-light); letter-spacing: 0.15em; text-transform: uppercase;">Actividad 10 · Master AI & Big Data</p>
+        <h1 class="reveal" style="margin-top: var(--element-gap);">
+            <span class="tableau-accent">Tableau</span> vs <span class="powerbi-accent">Power BI</span>
+        </h1>
+        <p class="subtitle reveal">Comparacion de herramientas de datos</p>
+        <div class="divider reveal" style="margin: var(--content-gap) auto;"></div>
+        <div class="reveal" style="display: flex; align-items: center; gap: clamp(1rem, 3vw, 2rem);">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Tableau_Logo.png" alt="Tableau" class="logo-img float" style="animation-delay: 0s;">
+            <span style="color: var(--text-secondary); font-size: var(--h3-size);">vs</span>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg" alt="Power BI" class="logo-img float" style="animation-delay: 1.5s;">
+        </div>
+        <p class="reveal" style="font-size: var(--body-size); color: var(--text-secondary); margin-top: var(--content-gap);">Alejandro Marinas · Sebastian Pavia</p>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 2: QUE VAMOS A COMPARAR
+     ============================================= -->
+<section class="slide" data-section="Intro">
+    <div class="slide-content">
+        <h2 class="reveal">Que vamos a comparar</h2>
+        <div class="reveal" style="display: flex; align-items: center; justify-content: center; gap: clamp(2rem, 6vw, 5rem); margin: var(--content-gap) 0;">
+            <div style="text-align: center;" class="reveal-left">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Tableau_Logo.png" alt="Tableau" style="height: clamp(40px, 7vw, 70px); margin-bottom: var(--content-gap);">
+                <h3 class="tableau-accent" style="font-size: var(--h2-size);">Tableau</h3>
+                <p style="margin-top: var(--element-gap);">Herramienta vista en clase</p>
+                <span class="tag tag-tableau" style="margin-top: var(--element-gap);">Salesforce · 2019</span>
+            </div>
+            <div style="text-align: center;" class="reveal-scale">
+                <div style="width: clamp(50px, 8vw, 80px); height: clamp(50px, 8vw, 80px); border-radius: 50%; background: var(--accent-glow); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center;">
+                    <span style="font-family: var(--font-display); font-weight: 700; font-size: var(--h3-size); color: var(--accent-light);">VS</span>
+                </div>
+            </div>
+            <div style="text-align: center;" class="reveal-right">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg" alt="Power BI" style="height: clamp(40px, 7vw, 70px); margin-bottom: var(--content-gap);">
+                <h3 class="powerbi-accent" style="font-size: var(--h2-size);">Power BI</h3>
+                <p style="margin-top: var(--element-gap);">Herramienta competidora</p>
+                <span class="tag tag-powerbi" style="margin-top: var(--element-gap);">Microsoft · 2015</span>
+            </div>
+        </div>
+        <div class="divider reveal" style="margin: var(--content-gap) auto;"></div>
+        <p class="reveal" style="text-align: center;">Mismo dataset · Mismo caso practico · Comparacion real</p>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 3: DATASET
+     ============================================= -->
+<section class="slide" data-section="Intro">
+    <div class="slide-content">
+        <div class="reveal" style="display: flex; align-items: center; gap: var(--content-gap); margin-bottom: var(--content-gap);">
+            <lord-icon src="https://cdn.lordicon.com/fihkmkwt.json" trigger="loop" delay="2000" colors="primary:#60a5fa,secondary:#3b82f6" style="width:48px;height:48px;"></lord-icon>
+            <h2 style="margin-bottom: 0;">El dataset</h2>
+        </div>
+        <h3 class="reveal accent" style="font-size: var(--h2-size); margin-bottom: var(--element-gap);">Black Friday Sales</h3>
+        <p class="reveal" style="font-size: var(--body-size); max-width: 700px; color: var(--text-primary); margin-bottom: var(--content-gap);">Datos reales de compras durante el Black Friday en India. Cada fila es una transaccion con informacion del cliente (genero, edad, ciudad, ocupacion) y del producto comprado.</p>
+        <div style="display: flex; gap: clamp(1.5rem, 4vw, 3rem); flex-wrap: wrap; margin-bottom: var(--content-gap);" class="reveal">
+            <div style="text-align: center;">
+                <span style="font-family: var(--font-display); font-size: var(--h3-size); font-weight: 700; color: var(--accent-light);">550K</span>
+                <p style="font-size: var(--small-size);">transacciones</p>
+            </div>
+            <div style="text-align: center;">
+                <span style="font-family: var(--font-display); font-size: var(--h3-size); font-weight: 700; color: var(--accent-light);">5.891</span>
+                <p style="font-size: var(--small-size);">clientes</p>
+            </div>
+            <div style="text-align: center;">
+                <span style="font-family: var(--font-display); font-size: var(--h3-size); font-weight: 700; color: var(--accent-light);">12</span>
+                <p style="font-size: var(--small-size);">variables</p>
+            </div>
+            <div style="text-align: center;">
+                <span style="font-family: var(--font-display); font-size: var(--h3-size); font-weight: 700; color: var(--accent-light);">5.096M</span>
+                <p style="font-size: var(--small-size);">en ventas</p>
+            </div>
+        </div>
+        <p class="reveal" style="font-size: var(--small-size); color: var(--text-secondary);">Fuente: Kaggle · Variables: genero, edad, ocupacion, ciudad, estado civil, categorias de producto, importe</p>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 4: QUE ES TABLEAU
+     ============================================= -->
+<section class="slide glow-tableau" data-section="Herramientas">
+    <div class="slide-content">
+        <div class="logo-header reveal">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Tableau_Logo.png" alt="Tableau" class="logo-img">
+            <span class="tag tag-tableau">Salesforce · desde 2019</span>
+        </div>
+        <p class="reveal subtitle" style="max-width: 700px; font-style: italic;">"El mejor en visualizacion de datos"</p>
+        <div class="divider reveal"></div>
+        <ul class="reveal" style="list-style: none; display: flex; flex-direction: column; gap: var(--element-gap);">
+            <li style="color: var(--text-primary);">→ Plataforma de <strong style="color: var(--accent-light);">BI</strong> <span style="color: var(--text-secondary); font-size: var(--small-size);">(Business Intelligence — convertir datos en decisiones)</span></li>
+            <li style="color: var(--text-primary);">→ Motor <strong style="color: var(--tableau-color);">VizQL</strong>: drag & drop convertido en queries optimizadas</li>
+            <li style="color: var(--text-primary);">→ Multiplataforma: Windows, Mac, Web</li>
+            <li style="color: var(--text-primary);">→ Desde <strong>$75/usuario/mes</strong> (Creator)</li>
+        </ul>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 5: QUE ES POWER BI
+     ============================================= -->
+<section class="slide glow-powerbi" data-section="Herramientas">
+    <div class="slide-content">
+        <div class="logo-header reveal">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg" alt="Power BI" class="logo-img">
+            <span class="tag tag-powerbi">Microsoft · desde 2015</span>
+        </div>
+        <p class="reveal subtitle" style="max-width: 700px; font-style: italic;">"BI corporativo accesible integrado con Microsoft"</p>
+        <div class="divider reveal"></div>
+        <ul class="reveal" style="list-style: none; display: flex; flex-direction: column; gap: var(--element-gap);">
+            <li style="color: var(--text-primary);">→ Suite de analisis y BI integrada en Microsoft 365 / Azure</li>
+            <li style="color: var(--text-primary);">→ <strong style="color: var(--powerbi-color);">DAX + Power Query</strong>: modelado de datos muy potente</li>
+            <li style="color: var(--text-primary);">→ Desktop gratuito, solo Windows</li>
+            <li style="color: var(--text-primary);">→ Desde <strong>$10/usuario/mes</strong> (Pro)</li>
+        </ul>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 6: COMPARACION CONCEPTUAL
+     ============================================= -->
+<section class="slide" data-section="Comparacion">
+    <div class="slide-content">
+        <h2 class="reveal">Comparacion conceptual</h2>
+        <table class="compare-table reveal-scale">
+            <thead>
+                <tr>
+                    <th>Aspecto</th>
+                    <th class="col-tableau">Tableau</th>
+                    <th class="col-powerbi">Power BI</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td style="color: var(--text-primary);">Foco</td><td>Exploracion visual avanzada</td><td>Reporting corporativo, self-service BI</td></tr>
+                <tr><td style="color: var(--text-primary);">Fortaleza</td><td>Visualizaciones best-in-class</td><td>Ecosistema Microsoft + precio</td></tr>
+                <tr><td style="color: var(--text-primary);">Usuario</td><td>Data Analyst</td><td>Business Analyst, BI Developer</td></tr>
+                <tr><td style="color: var(--text-primary);">Precio</td><td>$75/usuario/mes</td><td>$10/usuario/mes</td></tr>
+                <tr><td style="color: var(--text-primary);">Conectores</td><td>90+ nativos</td><td>150+ nativos</td></tr>
+                <tr><td style="color: var(--text-primary);">IA integrada</td><td>Tableau Pulse, Einstein</td><td>Copilot, Azure ML</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 7: VENTAJAS Y LIMITACIONES
+     ============================================= -->
+<section class="slide" data-section="Comparacion">
+    <div class="slide-content">
+        <h2 class="reveal">Ventajas y limitaciones</h2>
+        <div class="two-col" style="flex: 1;">
+            <!-- TABLEAU -->
+            <div class="reveal-left" style="display: flex; flex-direction: column; gap: clamp(0.6rem, 1.5vh, 1.2rem);">
+                <div style="display: flex; align-items: center; gap: var(--element-gap);">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Tableau_Logo.png" alt="Tableau" style="height: 28px;">
+                    <h3 class="tableau-accent">Tableau</h3>
+                </div>
+                <p style="font-size: var(--h3-size); color: var(--green);">+ Visualizaciones best-in-class</p>
+                <p style="font-size: var(--h3-size); color: var(--green);">+ Multiplataforma (Win, Mac, Web)</p>
+                <p style="font-size: var(--h3-size); color: var(--green);">+ Comunidad muy activa</p>
+                <div style="width: 100%; height: 1px; background: rgba(255,255,255,0.06);"></div>
+                <p style="font-size: var(--h3-size); color: var(--red);">- Precio elevado ($75/mes)</p>
+                <p style="font-size: var(--h3-size); color: var(--red);">- ETL basico (Tableau Prep)</p>
+            </div>
+            <!-- POWER BI -->
+            <div class="reveal-right" style="display: flex; flex-direction: column; gap: clamp(0.6rem, 1.5vh, 1.2rem);">
+                <div style="display: flex; align-items: center; gap: var(--element-gap);">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg" alt="Power BI" style="height: 28px;">
+                    <h3 class="powerbi-accent">Power BI</h3>
+                </div>
+                <p style="font-size: var(--h3-size); color: var(--green);">+ Desktop gratuito, Pro $10/mes</p>
+                <p style="font-size: var(--h3-size); color: var(--green);">+ Integrado con Office 365 y Teams</p>
+                <p style="font-size: var(--h3-size); color: var(--green);">+ DAX y Power Query muy potentes</p>
+                <div style="width: 100%; height: 1px; background: rgba(255,255,255,0.06);"></div>
+                <p style="font-size: var(--h3-size); color: var(--red);">- Solo Windows para Desktop</p>
+                <p style="font-size: var(--h3-size); color: var(--red);">- Menos flexible visualmente</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 8: USO EN EMPRESAS
+     ============================================= -->
+<section class="slide" data-section="Empresas">
+    <div class="slide-content">
+        <h2 class="reveal">Uso en empresas</h2>
+        <!-- Cuota de mercado visual -->
+        <div class="reveal" style="margin-bottom: var(--content-gap);">
+            <h3 style="margin-bottom: var(--element-gap);">Cuota de mercado</h3>
+            <div style="display: flex; gap: var(--element-gap); align-items: flex-end; height: clamp(100px, 22vh, 200px);">
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <span style="font-family: var(--font-display); font-weight: 700; font-size: var(--h3-size); color: var(--powerbi-color);">36-40%</span>
+                    <div style="width: 100%; height: 70%; background: linear-gradient(to top, var(--powerbi-color), rgba(242,200,17,0.3)); border-radius: 8px 8px 0 0;"></div>
+                    <span style="font-size: var(--small-size); color: var(--text-secondary);">Power BI</span>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <span style="font-family: var(--font-display); font-weight: 700; font-size: var(--h3-size); color: var(--tableau-color);">15-18%</span>
+                    <div style="width: 100%; height: 35%; background: linear-gradient(to top, var(--tableau-color), rgba(233,118,39,0.3)); border-radius: 8px 8px 0 0;"></div>
+                    <span style="font-size: var(--small-size); color: var(--text-secondary);">Tableau</span>
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <span style="font-family: var(--font-display); font-weight: 700; font-size: var(--h3-size); color: var(--text-secondary);">~45%</span>
+                    <div style="width: 100%; height: 50%; background: linear-gradient(to top, rgba(255,255,255,0.15), rgba(255,255,255,0.03)); border-radius: 8px 8px 0 0;"></div>
+                    <span style="font-size: var(--small-size); color: var(--text-secondary);">Otros</span>
+                </div>
+            </div>
+            <p style="font-size: var(--small-size); margin-top: var(--element-gap); text-align: center;">Ambas "Leaders" en Gartner Magic Quadrant 2024</p>
+        </div>
+        <!-- Empresas -->
+        <div class="two-col reveal">
+            <div>
+                <h3 style="margin-bottom: var(--element-gap);"><span class="tableau-accent">Tableau</span> — Empresas</h3>
+                <div class="company-list">
+                    <span class="company-tag">Netflix</span><span class="company-tag">Amazon</span><span class="company-tag">Deloitte</span><span class="company-tag">Coca-Cola</span><span class="company-tag">JP Morgan</span><span class="company-tag">LinkedIn</span><span class="company-tag">Verizon</span><span class="company-tag">Lufthansa</span>
+                </div>
+                <p style="font-size: var(--small-size); margin-top: var(--element-gap);">Fuerte en: <strong style="color: var(--text-primary);">Tech, Retail, Consultoria</strong></p>
+            </div>
+            <div>
+                <h3 style="margin-bottom: var(--element-gap);"><span class="powerbi-accent">Power BI</span> — Empresas</h3>
+                <div class="company-list">
+                    <span class="company-tag">Nestle</span><span class="company-tag">Adobe</span><span class="company-tag">KPMG</span><span class="company-tag">Santander</span><span class="company-tag">Telefonica</span><span class="company-tag">HP</span><span class="company-tag">PwC</span><span class="company-tag">Rolls-Royce</span>
+                </div>
+                <p style="font-size: var(--small-size); margin-top: var(--element-gap);">Fuerte en: <strong style="color: var(--text-primary);">Finanzas, Gobierno, Educacion</strong></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 9: DEMANDA LABORAL
+     ============================================= -->
+<section class="slide" data-section="Empresas">
+    <div class="slide-content">
+        <h2 class="reveal">Demanda laboral</h2>
+        <!-- Ofertas visual bars - más grandes -->
+        <div class="reveal" style="margin-bottom: var(--content-gap);">
+            <h3 style="margin-bottom: var(--content-gap);">Ofertas en LinkedIn</h3>
+            <div style="display: flex; align-items: center; gap: var(--content-gap); margin-bottom: var(--content-gap);">
+                <span style="font-size: var(--h3-size); color: var(--powerbi-color); min-width: 90px; font-weight: 600;">Power BI</span>
+                <div style="flex: 1; height: clamp(40px, 7vh, 60px); background: linear-gradient(90deg, var(--powerbi-color), rgba(242,200,17,0.3)); border-radius: 10px; display: flex; align-items: center; justify-content: flex-end; padding-right: clamp(12px, 2vw, 20px);">
+                    <span style="font-family: var(--font-display); font-weight: 700; font-size: var(--h2-size); color: #1a1a1a;">120K</span>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: var(--content-gap);">
+                <span style="font-size: var(--h3-size); color: var(--tableau-color); min-width: 90px; font-weight: 600;">Tableau</span>
+                <div style="flex: 0.58; height: clamp(40px, 7vh, 60px); background: linear-gradient(90deg, var(--tableau-color), rgba(233,118,39,0.3)); border-radius: 10px; display: flex; align-items: center; justify-content: flex-end; padding-right: clamp(12px, 2vw, 20px);">
+                    <span style="font-family: var(--font-display); font-weight: 700; font-size: var(--h2-size); color: white;">70K</span>
+                </div>
+            </div>
+            <p style="font-size: var(--body-size); margin-top: var(--element-gap); text-align: right;">Power BI tiene <strong style="color: var(--accent-light); font-size: var(--h3-size);">1.6x</strong> mas demanda</p>
+        </div>
+        <!-- Salarios y certificaciones - más grandes -->
+        <div class="two-col reveal" style="flex: 1;">
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+                <h3 style="margin-bottom: var(--content-gap);">Salarios en Espana</h3>
+                <div style="margin-bottom: var(--content-gap);">
+                    <span style="font-family: var(--font-display); font-size: var(--h2-size); font-weight: 700; color: var(--powerbi-color);">28K - 42K</span>
+                    <span style="font-size: var(--body-size); color: var(--text-secondary);"> EUR · Power BI</span>
+                </div>
+                <div>
+                    <span style="font-family: var(--font-display); font-size: var(--h2-size); font-weight: 700; color: var(--tableau-color);">32K - 48K</span>
+                    <span style="font-size: var(--body-size); color: var(--text-secondary);"> EUR · Tableau</span>
+                </div>
+                <p style="font-size: var(--body-size); margin-top: var(--content-gap);">Tableau paga mas por roles especializados</p>
+            </div>
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+                <h3 style="margin-bottom: var(--content-gap);">Certificaciones clave</h3>
+                <p style="font-size: var(--h3-size); margin-bottom: var(--element-gap);"><span class="powerbi-accent" style="font-weight: 600;">PL-300</span></p>
+                <p style="font-size: var(--body-size); margin-bottom: var(--content-gap);">Power BI Data Analyst — la mas demandada</p>
+                <p style="font-size: var(--h3-size); margin-bottom: var(--element-gap);"><span class="tableau-accent" style="font-weight: 600;">Certified Data Analyst</span></p>
+                <p style="font-size: var(--body-size);">Tableau — rol mas especializado</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 10: TUTORIAL TABLEAU
+     ============================================= -->
+<section class="slide glow-tableau" data-section="Tutorial">
+    <div class="slide-content">
+        <div class="logo-header reveal">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Tableau_Logo.png" alt="Tableau" class="logo-img">
+            <h2 style="margin-bottom: 0;">Caso end-to-end</h2>
+        </div>
+        <div class="timeline reveal">
+            <div class="timeline-item">
+                <div class="timeline-dot tableau"></div>
+                <div class="timeline-content">
+                    <h3>Conectar dataset</h3>
+                    <p>Importar CSV Black Friday Sales (550K filas)</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot tableau"></div>
+                <div class="timeline-content">
+                    <h3>Preparar datos</h3>
+                    <p>Ajustar tipos: User_ID, Occupation, Marital Status a Cadena</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot tableau"></div>
+                <div class="timeline-content">
+                    <h3>Crear KPIs</h3>
+                    <p>Total ventas (5.096M) · Ticket medio (9.264) · Clientes unicos (5.891)</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot tableau"></div>
+                <div class="timeline-content">
+                    <h3>Construir graficos</h3>
+                    <p>6 visualizaciones: tarta, barras, treemap, area</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot tableau"></div>
+                <div class="timeline-content">
+                    <h3>Montar dashboards</h3>
+                    <p>2 dashboards: Resumen General + Detalle</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot tableau"></div>
+                <div class="timeline-content">
+                    <h3>Publicar</h3>
+                    <p>Subir a Tableau Public para acceso online</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 11: TUTORIAL POWER BI
+     ============================================= -->
+<section class="slide glow-powerbi" data-section="Tutorial">
+    <div class="slide-content">
+        <div class="logo-header reveal">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg" alt="Power BI" class="logo-img">
+            <h2 style="margin-bottom: 0;">Caso end-to-end</h2>
+        </div>
+        <div class="placeholder reveal">
+            <p>[ Pendiente — Sebastian completara esta seccion ]</p>
+        </div>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 12: DASHBOARD TABLEAU (boton)
+     ============================================= -->
+<section class="slide" data-section="Dashboards">
+    <div class="slide-content" style="align-items: center; text-align: center;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4b/Tableau_Logo.png" alt="Tableau" class="logo-img reveal" style="margin-bottom: var(--content-gap);">
+        <h2 class="reveal">Dashboard en Tableau</h2>
+        <p class="reveal subtitle" style="max-width: 500px;">2 dashboards interactivos: Resumen General y Detalle de productos</p>
+        <div style="margin-top: var(--content-gap);" class="reveal">
+            <a href="https://public.tableau.com/app/profile/alejandro.marinas/viz/actividad10_17760781188610/Resumengeneral" target="_blank" class="cta-btn cta-tableau">
+                Ver dashboard interactivo
+                <span class="cta-arrow">→</span>
+            </a>
+        </div>
+        <p class="reveal" style="font-size: var(--small-size); margin-top: var(--content-gap); color: var(--text-secondary);">Publicado en Tableau Public · Acceso sin instalacion</p>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 13: DASHBOARD POWER BI
+     ============================================= -->
+<section class="slide" data-section="Dashboards">
+    <div class="slide-content" style="align-items: center; text-align: center;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cf/New_Power_BI_Logo.svg" alt="Power BI" class="logo-img reveal" style="margin-bottom: var(--content-gap);">
+        <h2 class="reveal">Dashboard en Power BI</h2>
+        <div class="placeholder reveal" style="max-width: 500px; width: 100%;">
+            <p>[ Pendiente — Sebastian completara esta seccion ]</p>
+        </div>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 14: COMPARACION PERSONAL
+     ============================================= -->
+<section class="slide" data-section="Conclusion">
+    <div class="slide-content">
+        <h2 class="reveal">Nuestra experiencia</h2>
+        <table class="compare-table reveal-scale">
+            <thead>
+                <tr>
+                    <th>Aspecto</th>
+                    <th class="col-tableau">Tableau</th>
+                    <th class="col-powerbi">Power BI</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td style="color: var(--text-primary);">Instalacion</td><td>[ pendiente ]</td><td>[ pendiente ]</td></tr>
+                <tr><td style="color: var(--text-primary);">Facilidad de uso</td><td>[ pendiente ]</td><td>[ pendiente ]</td></tr>
+                <tr><td style="color: var(--text-primary);">Proyectos reales</td><td>[ pendiente ]</td><td>[ pendiente ]</td></tr>
+                <tr><td style="color: var(--text-primary);">Entorno empresarial</td><td>[ pendiente ]</td><td>[ pendiente ]</td></tr>
+            </tbody>
+        </table>
+        <p class="reveal" style="text-align: center; margin-top: var(--content-gap); font-size: var(--small-size);">Basado en nuestra experiencia real usando ambas herramientas</p>
+    </div>
+</section>
+
+<!-- =============================================
+     SLIDE 15: CONCLUSIONES
+     ============================================= -->
+<section class="slide" data-section="Conclusion">
+    <div class="slide-content">
+        <h2 class="reveal">Conclusiones</h2>
+        <div style="display: flex; flex-direction: column; gap: var(--content-gap);">
+            <div class="card reveal" style="display: flex; gap: var(--content-gap); align-items: flex-start;">
+                <div class="conclusion-number">1</div>
+                <div>
+                    <h3>Power BI gana en volumen y accesibilidad</h3>
+                    <p>Herramienta BI mas adoptada del mundo. Ecosistema Microsoft + precio agresivo.</p>
+                </div>
+            </div>
+            <div class="card reveal" style="display: flex; gap: var(--content-gap); align-items: flex-start;">
+                <div class="conclusion-number">2</div>
+                <div>
+                    <h3>Tableau gana en visualizacion</h3>
+                    <p>Estandar de referencia en exploracion visual. Roles mas especializados.</p>
+                </div>
+            </div>
+            <div class="card reveal" style="display: flex; gap: var(--content-gap); align-items: flex-start;">
+                <div class="conclusion-number">3</div>
+                <div>
+                    <h3>No es "una u otra" — es contexto</h3>
+                    <p>Depende del ecosistema, presupuesto y nivel de sofisticacion analitica.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    class SlidePresentation {
+        constructor() {
+            this.slides = document.querySelectorAll('.slide');
+            this.progressBar = document.getElementById('progressBar');
+            this.navDotsContainer = document.getElementById('navDots');
+            this.sectionItems = document.querySelectorAll('.section-item');
+            this.currentSlide = 0;
+
+            this.createNavDots();
+            this.setupIntersectionObserver();
+            this.setupKeyboardNav();
+            this.setupTouchNav();
+            this.setupSectionNav();
+            this.updateProgress();
+        }
+
+        createNavDots() {
+            this.slides.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.classList.add('nav-dot');
+                dot.setAttribute('aria-label', `Slide ${i + 1}`);
+                dot.addEventListener('click', () => this.goToSlide(i));
+                this.navDotsContainer.appendChild(dot);
+            });
+            this.navDots = document.querySelectorAll('.nav-dot');
+        }
+
+        setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        const index = Array.from(this.slides).indexOf(entry.target);
+                        this.currentSlide = index;
+                        this.updateProgress();
+                        this.updateNavDots();
+                        this.updateSectionNav();
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            this.slides.forEach(slide => observer.observe(slide));
+        }
+
+        setupKeyboardNav() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+                    e.preventDefault();
+                    this.goToSlide(Math.min(this.currentSlide + 1, this.slides.length - 1));
+                } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    this.goToSlide(Math.max(this.currentSlide - 1, 0));
+                }
+            });
+        }
+
+        setupTouchNav() {
+            let startY = 0;
+            document.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; });
+            document.addEventListener('touchend', (e) => {
+                const diff = startY - e.changedTouches[0].clientY;
+                if (Math.abs(diff) > 50) {
+                    if (diff > 0) this.goToSlide(Math.min(this.currentSlide + 1, this.slides.length - 1));
+                    else this.goToSlide(Math.max(this.currentSlide - 1, 0));
+                }
+            });
+        }
+
+        setupSectionNav() {
+            this.sectionItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const slideIndex = parseInt(item.dataset.section);
+                    this.goToSlide(slideIndex);
+                });
+            });
+        }
+
+        goToSlide(index) {
+            this.slides[index].scrollIntoView({ behavior: 'smooth' });
+        }
+
+        updateProgress() {
+            const progress = ((this.currentSlide + 1) / this.slides.length) * 100;
+            this.progressBar.style.width = `${progress}%`;
+        }
+
+        updateNavDots() {
+            this.navDots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === this.currentSlide);
+            });
+        }
+
+        updateSectionNav() {
+            const sectionMap = {
+                0: 0, 1: 0, 2: 0,     // Intro
+                3: 3, 4: 3,             // Herramientas
+                5: 5, 6: 5,             // Comparacion
+                7: 7, 8: 7,             // Empresas
+                9: 9, 10: 9,            // Tutorial
+                11: 11, 12: 11,         // Dashboards
+                13: 13, 14: 13          // Conclusion
+            };
+
+            const activeSection = sectionMap[this.currentSlide] ?? 0;
+
+            this.sectionItems.forEach(item => {
+                const section = parseInt(item.dataset.section);
+                item.classList.toggle('active', section === activeSection);
+            });
+        }
+    }
+
+    new SlidePresentation();
+</script>
+
+</body>
+</html>
