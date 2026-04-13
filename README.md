@@ -64,6 +64,10 @@ Comparar **Tableau** (herramienta vista en clase) con **Power BI** (competidora)
 | Precio/licenciamiento | | |
 | Demanda laboral | | |
 
+## Dashboards online
+
+- **Tableau**: [Ver en Tableau Public](https://public.tableau.com/app/profile/alejandro.marinas/viz/actividad10_17760781188610/Resumengeneral)
+
 ## Equipo
 
 - Alejandro Marinas
